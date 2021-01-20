@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xiang.demo.mapper.RolePermissionMapper">
+
+
+    <!--批量删除角色权限-->
+    <delete id="deleteByBatchIds">
+        update role_permission set deleted=1  where role_id in
+        <foreach collection="collection" item="batchIds" open="(" separator="," close=")">
+            #{batchIds}
+        </foreach>
+    </delete>
+
+    <!--查找权限是否被分配-->
+    <select id="selectRolePermissionByBatchIds" resultType="com.xiang.demo.entity.RolePermission">
+        select rp.id from role_permission rp where deleted=0 and rp.permission_id in
+        <foreach collection="collection" item="batchIds" open="(" separator="," close=")">
+            #{batchIds}
+        </foreach>
+    </select>
+</mapper>

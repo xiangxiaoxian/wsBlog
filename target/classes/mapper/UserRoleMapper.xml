@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xiang.demo.mapper.UserRoleMapper">
+
+    <!--批量删除用户角色-->
+    <delete id="deleteUserRoleByBatchIds">
+        update user_role set deleted=1  where user_id in
+        <foreach collection="collection" item="batchIds" open="(" separator="," close=")">
+            #{batchIds}
+        </foreach>
+    </delete>
+
+    <!--批量查找该角色下是否有用户-->
+    <select id="selectByBatchIds" resultType="com.xiang.demo.entity.UserRole">
+        select ur.id from user_role ur where deleted=0 and ur.role_id in
+        <foreach collection="collection" item="batchIds" open="(" separator="," close=")">
+            #{batchIds}
+        </foreach>
+    </select>
+</mapper>

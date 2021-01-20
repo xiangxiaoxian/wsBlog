@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xiang.demo.mapper.LableMapper">
+
+    <!--根据标签id查询属于当前标签下的文章并分页-->
+    <select id="getArticlesBySortIdAndPage" resultType="com.xiang.demo.entity.Article">
+         SELECT a.id,a.title,a.pub_time,a.star,a.reply,a.browse,a.content,a.user_id,u.nick_name
+        FROM article_lable al
+        LEFT JOIN article a on al.article_id=a.id
+        LEFT JOIN `user` u on a.user_id=u.id
+        WHERE al.lable_id=#{id} and a.deleted=0
+        ORDER BY al.lable_id
+    </select>
+</mapper>

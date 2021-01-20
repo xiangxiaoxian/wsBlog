@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xiang.demo.mapper.ArticleMapper">
+    <resultMap id="article" type="com.xiang.demo.entity.Article">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="pubTime" column="pub_time"/>
+        <result property="star" column="star"/>
+        <result property="reply" column="reply"/>
+        <result property="browse" column="browse"/>
+        <association property="user" javaType="com.xiang.demo.entity.User">
+            <result property="nickName" column="nickName"/>
+        </association>
+        <collection property="comments" ofType="com.xiang.demo.entity.Comments">
+            <id property="id" column="commentsId"/>
+            <result property="commentsDate" column="commentsDate"/>
+            <result property="star" column="cStar"/>
+            <result property="content" column="cContent"/>
+            <result property="parentCommentsId" column="parentCommentsId"/>
+            <association property="commentsUser" javaType="com.xiang.demo.entity.User">
+                <id property="id" column="userId"/>
+                <result property="nickName" column="cNickName"/>
+            </association>
+        </collection>
+    </resultMap>
+    <!--对浏览记录加1-->
+    <update id="upBrowseOne">
+        UPDATE article SET browse=browse+1 where id=#{id}
+    </update>
+    <!--对点赞数加1-->
+    <update id="upStarOne">
+        UPDATE article SET star=star+1 where id=#{id}
+    </update>
+    <!--对点赞数减1-->
+    <update id="lowStar">
+        UPDATE article SET star=star-1 where id=#{id}
+    </update>
+    <!--对评论数加1-->
+    <update id="upCommentsByArticleId">
+        UPDATE article SET reply=reply+1 where id=#{articleId}
+    </update>
+    <!--对评论数减1-->
+    <update id="lowCommentsByArticleId">
+        UPDATE article SET reply=reply-1 where id=#{articleId}
+    </update>
+    <!--列表id查询是否有文章-->
+    <select id="selectArticleByUserBatchIds" resultType="com.xiang.demo.entity.Article">
+        select a.id from article a where deleted = 0 and a.user_id in
+        <foreach collection="collection" item="batchIds" open="(" separator="," close=")">
+            #{batchIds}
+        </foreach>
+    </select>
+    <!--查询全部文章按条件-->
+    <select id="getAllArticlesAndPages" resultMap="article">
+        SELECT a.id,a.browse,a.content,a.pub_time,a.reply,a.star,a.title,a.user_id,u.nick_name as nickName
+        from article a
+        LEFT JOIN `user` u on a.user_id=u.id
+        ${ew.customSqlSegment}
+    </select>
+
+    <!--查询单条文章详情-->
+    <select id="getArticleByArticleId" resultMap="article">
+        SELECT a.id,a.browse,a.content,a.pub_time,a.reply,a.star,a.title,a.user_id,
+        u.nick_name as nickName,
+        c.comments_date as commentsDate ,c.star as cStar,c.content as cContent,c.parent_comments_id as parentCommentsId,
+        us.nick_name as cNickName,us.id as userId
+        from article a
+        LEFT JOIN `user` u on a.user_id=u.id
+        LEFT JOIN comments c on a.id=c.article_id
+        LEFT JOIN `user` us on c.user_id=us.id
+        where a.id=#{id}
+        ORDER BY a.id
+    </select>
+</mapper>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xiang.demo.mapper.RoleMapper">
+
+    <!--根据角色id查询角色所拥有的权限-->
+    <select id="getRolePermissionByRoleId" resultType="com.xiang.demo.entity.Permission">
+        SELECT p.id,p.permission_name,p.permission_comments
+        FROM role_permission rp
+        LEFT JOIN permission p on rp.role_id=p.id
+        WHERE rp.deleted=0 and rp.role_id=#{id}
+    </select>
+</mapper>
