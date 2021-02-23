@@ -82,6 +82,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
       if (!ObjectUtils.isEmpty(userMapper.selectOne(wrapper))) {
         return Result.error(400, "账号已经被注册使用");
       }
+      QueryWrapper<User> wrapperByNickName = new QueryWrapper<User>();
+        wrapperByNickName.eq("nick_name", user.getNickName());
+      if (!ObjectUtils.isEmpty(userMapper.selectOne(wrapperByNickName))) {
+        return Result.error(400, "昵称已被占用");
+      }
+      QueryWrapper<User> wrapperByEmail = new QueryWrapper<User>();
+        wrapperByEmail.eq("email", user.getEmail());
+      if (!ObjectUtils.isEmpty(userMapper.selectOne(wrapperByEmail))) {
+        return Result.error(400, "该邮箱已被使用，请更换邮箱，若忘记密码，请修改密码");
+      }
+      QueryWrapper<User> wrapperByPhoneNumber = new QueryWrapper<User>();
+        wrapperByPhoneNumber.eq("phone_number", user.getPhoneNumber());
+      if (!ObjectUtils.isEmpty(userMapper.selectOne(wrapperByPhoneNumber))) {
+        return Result.error(400, "该号码已被使用，请更换号码，若忘记密码，请修改密码");
+      }
       userMapper.insert(user);
       userRole.setUserId(userMapper.selectOne(wrapper).getId()); // 对注册的用户进行角色分配
       userRole.setRoleId(new Long(3));
@@ -105,7 +120,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
   public Result deleteUserById(Long id) {
     // 判断该角色下是否拥有文章
     QueryWrapper<Article> articleQueryWrapper = new QueryWrapper<>();
-    articleQueryWrapper.eq("user_id", id).eq("deleted",0);
+    articleQueryWrapper.eq("user_id", id).eq("deleted", 0);
     List<Article> articleList = articleMapper.selectList(articleQueryWrapper);
     if (!ObjectUtils.isEmpty(articleList)) {
       return Result.error(400, "该账户下存在博文,无法删除");
@@ -131,9 +146,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
   // 查询所有用户并进行分页处理
   @Override
-  public Result getAllUserAndPages(Page page,String searchField) {
+  public Result getAllUserAndPages(Page page, String searchField) {
     QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-    queryWrapper.like("nick_name",searchField);
+    queryWrapper.like("nick_name", searchField);
     return Result.success(200, "查询成功", (Page<User>) userMapper.selectMapsPage(page, queryWrapper));
   }
 
@@ -146,12 +161,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     wrapperByUserRole.eq("user_id", userId);
     userRoleMapper.delete(wrapperByUserRole);
     // 分配新的角色
-    UserRole userRole=new UserRole();
+    UserRole userRole = new UserRole();
     userRole.setUserId(userId);
     for (Long roleId : batchRoleIds) {
       userRole.setRoleId(roleId);
       userRoleMapper.insert(userRole);
     }
-    return Result.success(200,"分配成功",null);
+    return Result.success(200, "分配成功", null);
   }
 }
