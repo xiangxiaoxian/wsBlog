@@ -2,6 +2,8 @@ server:
   port: 8080
 
 
+
+
 spring:
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
@@ -13,6 +15,20 @@ spring:
     time-zone: GMT+8
   profiles:
     active: dev
+  mail:
+    host: smtp.qq.com
+    username: 1924837954@qq.com
+    password: ybuurusnyhiueidh
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          ssl:
+            enable: true
+    default-encoding: utf-8
 
 
 #  jackson:

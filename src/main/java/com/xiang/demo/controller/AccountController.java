@@ -52,6 +52,12 @@ public class AccountController {
     public Result register(@RequestBody User user){
         return userService.registerOrUpdateUserById(user);
     }
+    //验证码接口
+    @ApiOperation(value = "验证码接口")
+    @PostMapping("/register/validation")
+    public Result validation(@RequestBody User user){
+        return userService.validationSend(user.getEmail());
+    }
 
 
 }

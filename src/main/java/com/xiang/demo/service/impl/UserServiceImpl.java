@@ -1,21 +1,21 @@
 package com.xiang.demo.service.impl;
 
 import cn.hutool.crypto.SecureUtil;
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xiang.common.Result;
-import com.xiang.demo.entity.Article;
-import com.xiang.demo.entity.RolePermission;
-import com.xiang.demo.entity.User;
-import com.xiang.demo.entity.UserRole;
+import com.xiang.demo.entity.*;
 import com.xiang.demo.mapper.ArticleMapper;
 import com.xiang.demo.mapper.UserMapper;
 import com.xiang.demo.mapper.UserRoleMapper;
 import com.xiang.demo.service.UserService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.xiang.utils.JwtUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.MailException;
+import org.springframework.mail.MailSender;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -41,6 +41,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
   @Resource private UserRoleMapper userRoleMapper;
 
   @Resource private ArticleMapper articleMapper;
+
+  @Resource private JavaMailSender mailSender;
+
 
   // 登录方法实现
   @Override
@@ -83,19 +86,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return Result.error(400, "账号已经被注册使用");
       }
       QueryWrapper<User> wrapperByNickName = new QueryWrapper<User>();
-        wrapperByNickName.eq("nick_name", user.getNickName());
+      wrapperByNickName.eq("nick_name", user.getNickName());
       if (!ObjectUtils.isEmpty(userMapper.selectOne(wrapperByNickName))) {
         return Result.error(400, "昵称已被占用");
       }
       QueryWrapper<User> wrapperByEmail = new QueryWrapper<User>();
-        wrapperByEmail.eq("email", user.getEmail());
+      wrapperByEmail.eq("email", user.getEmail());
       if (!ObjectUtils.isEmpty(userMapper.selectOne(wrapperByEmail))) {
         return Result.error(400, "该邮箱已被使用，请更换邮箱，若忘记密码，请修改密码");
-      }
-      QueryWrapper<User> wrapperByPhoneNumber = new QueryWrapper<User>();
-        wrapperByPhoneNumber.eq("phone_number", user.getPhoneNumber());
-      if (!ObjectUtils.isEmpty(userMapper.selectOne(wrapperByPhoneNumber))) {
-        return Result.error(400, "该号码已被使用，请更换号码，若忘记密码，请修改密码");
       }
       userMapper.insert(user);
       userRole.setUserId(userMapper.selectOne(wrapper).getId()); // 对注册的用户进行角色分配
@@ -168,5 +166,29 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
       userRoleMapper.insert(userRole);
     }
     return Result.success(200, "分配成功", null);
+  }
+
+  @Override
+  public Result validationSend(String email) {
+    QueryWrapper<User> wrapperByEmail = new QueryWrapper<User>();
+    wrapperByEmail.eq("email", email);
+    if (!ObjectUtils.isEmpty(userMapper.selectOne(wrapperByEmail))) {
+      return Result.error(400, "该邮箱已被使用，请更换邮箱，若忘记密码，请修改密码");
+    }
+    MailEntity mailEntity = new MailEntity();
+    String random = (int) ((Math.random() * 9 + 1) * 100000) + "";
+    SimpleMailMessage message = new SimpleMailMessage();
+    message.setFrom(mailEntity.getFromEmail()); // 发件人
+    message.setTo(email); // 收件人
+    message.setSubject(mailEntity.getSubject()); // 邮件标题
+    mailEntity.setContent(random);
+    message.setText(mailEntity.getContent()); // 邮件正文
+    try {
+      mailSender.send(message);
+      return Result.success(200, "发送成功", random);
+    } catch (MailException e) {
+      e.printStackTrace();
+      return Result.error(400,"发送失败");
+    }
   }
 }

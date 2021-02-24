@@ -32,4 +32,6 @@ public interface UserService extends IService<User> {
     Result getAllUserAndPages(Page page,String searchField);
 
     Result assignRoles(Long userId, Collection<Long> batchRoleIds);
+
+    Result validationSend(String email);
 }
