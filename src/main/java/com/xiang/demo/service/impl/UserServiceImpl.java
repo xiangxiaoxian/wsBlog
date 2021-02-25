@@ -22,9 +22,7 @@ import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 服务实现类
@@ -43,7 +41,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
   @Resource private ArticleMapper articleMapper;
 
   @Resource private JavaMailSender mailSender;
-
 
   // 登录方法实现
   @Override
@@ -170,6 +167,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
   @Override
   public Result validationSend(String email) {
+    // 验证该邮箱是否被注册
     QueryWrapper<User> wrapperByEmail = new QueryWrapper<User>();
     wrapperByEmail.eq("email", email);
     if (!ObjectUtils.isEmpty(userMapper.selectOne(wrapperByEmail))) {
@@ -188,7 +186,36 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
       return Result.success(200, "发送成功", random);
     } catch (MailException e) {
       e.printStackTrace();
-      return Result.error(400,"发送失败");
+      return Result.error(400, "发送失败");
+    }
+  }
+
+  @Override
+  public Result forgotPasswordByVerificationCode(User user) {
+    // 验证该邮箱是否被注册
+    QueryWrapper<User> wrapperByEmail = new QueryWrapper<User>();
+    wrapperByEmail.eq("email", user.getEmail());
+    user = userMapper.selectOne(wrapperByEmail);
+    if (ObjectUtils.isEmpty(user)) {
+      return Result.error(400, "该邮箱下无账号存在");
+    }
+    MailEntity mailEntity = new MailEntity();
+    String random = (int) ((Math.random() * 9 + 1) * 100000) + "";
+    SimpleMailMessage message = new SimpleMailMessage();
+    message.setFrom(mailEntity.getFromEmail()); // 发件人
+    message.setTo(user.getEmail()); // 收件人
+    message.setSubject(mailEntity.getSubject()); // 邮件标题
+    mailEntity.setContent(random);
+    message.setText(mailEntity.getContent()); // 邮件正文
+    HashMap<String, Object> data = new HashMap<>();
+    data.put("smsCode", random);
+    data.put("id", user.getId());
+    try {
+      mailSender.send(message);
+      return Result.success(200, "发送成功", data);
+    } catch (MailException e) {
+      e.printStackTrace();
+      return Result.error(400, "发送失败");
     }
   }
 }

@@ -60,4 +60,11 @@ public class AccountController {
     }
 
 
+    //验证码接口
+    @ApiOperation(value = "忘记密码验证码发送接口")
+    @PostMapping("/forgotPassword")
+    public Result forgotPasswordByVerificationCode(@RequestBody User user){
+        return userService.forgotPasswordByVerificationCode(user);
+    }
+
 }

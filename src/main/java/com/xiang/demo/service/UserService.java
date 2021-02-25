@@ -34,4 +34,6 @@ public interface UserService extends IService<User> {
     Result assignRoles(Long userId, Collection<Long> batchRoleIds);
 
     Result validationSend(String email);
+
+    Result forgotPasswordByVerificationCode(User user);
 }
