@@ -87,17 +87,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
       if (!ObjectUtils.isEmpty(userMapper.selectOne(wrapperByNickName))) {
         return Result.error(400, "昵称已被占用");
       }
-      QueryWrapper<User> wrapperByEmail = new QueryWrapper<User>();
-      wrapperByEmail.eq("email", user.getEmail());
-      if (!ObjectUtils.isEmpty(userMapper.selectOne(wrapperByEmail))) {
-        return Result.error(400, "该邮箱已被使用，请更换邮箱，若忘记密码，请修改密码");
-      }
       userMapper.insert(user);
       userRole.setUserId(userMapper.selectOne(wrapper).getId()); // 对注册的用户进行角色分配
       userRole.setRoleId(new Long(3));
       userRoleMapper.insert(userRole);
       return Result.success(200, "注册成功", user);
     } else {
+      QueryWrapper<User> wrapperByEmail = new QueryWrapper<User>();
+      wrapperByEmail.eq("email", user.getEmail());
+      if (!ObjectUtils.isEmpty(userMapper.selectOne(wrapperByEmail))) {
+        return Result.error(400, "该邮箱已被使用，请更换邮箱，若忘记密码，请修改密码");
+      }
       userMapper.updateById(user);
       return Result.success(200, "修改成功", user);
     }

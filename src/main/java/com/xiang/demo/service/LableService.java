@@ -26,4 +26,5 @@ public interface LableService extends IService<Lable> {
     Result deleteLablesByBatchIds(Collection<Long> batchIds);
 
     Result getArticlesByLableIdAndPage(Long id, Page page);
+
 }

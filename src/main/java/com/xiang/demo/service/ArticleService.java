@@ -7,6 +7,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.xiang.demo.entity.Lable;
 import com.xiang.demo.entity.Sort;
 
+import java.util.Map;
+
 /**
  * <p>
  *  文章
@@ -22,7 +24,7 @@ public interface ArticleService extends IService<Article> {
 
     Result getArticleByArticleId(Long id);
 
-    Result insertOrUpdateArticleByArticleId(Article article, Sort sort, Lable lable);
+    Result insertOrUpdateArticleByArticleId(Map<String,Object> data);
 
     Result deleteArticleByArticleId(Long id);
 

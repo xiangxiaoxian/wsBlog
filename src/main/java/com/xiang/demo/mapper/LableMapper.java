@@ -5,6 +5,8 @@ import com.xiang.demo.entity.Article;
 import com.xiang.demo.entity.Lable;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
+import java.util.List;
+
 /**
  * <p>
  *  Mapper 接口
@@ -16,4 +18,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 public interface LableMapper extends BaseMapper<Lable> {
 
     Page<Article> getArticlesBySortIdAndPage(Long id, Page page);
+
 }

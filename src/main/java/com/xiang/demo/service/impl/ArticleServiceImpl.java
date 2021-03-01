@@ -1,5 +1,7 @@
 package com.xiang.demo.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xiang.common.Result;
@@ -11,6 +13,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.Map;
 
 /**
  * 文章
@@ -49,22 +55,27 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article>
 
   // 新增或修改文章
   @Override
-  public Result insertOrUpdateArticleByArticleId(Article article, Sort sort, Lable lable) {
+  public Result insertOrUpdateArticleByArticleId(Map<String,Object> data) {
     ArticleSort articleSort = new ArticleSort();
     ArticleLable articleLable = new ArticleLable();
-    if (ObjectUtils.isEmpty(article)) { // 判断传递的实体id是否为空
+    Article article= JSON.parseObject(JSON.toJSONString(data.get("article")),Article.class);
+    Long sortId=Long.valueOf(data.get("sortId").toString());
+    Long lableId=Long.valueOf(data.get("lableId").toString());
+    System.out.println(lableId);
+    if (ObjectUtils.isEmpty(article.getId())) { // 判断传递的实体id是否为空
+      article.setPubTime(LocalDateTime.now());
       articleMapper.insert(article);
       // 查询刚插入的数据
       QueryWrapper<Article> articleQueryWrapper = new QueryWrapper<>();
-      articleQueryWrapper.eq("user_id", article.getUserId()).eq("title", article.getTitle());
+      articleQueryWrapper.eq("user_id", article.getUserId()).eq("title", article.getTitle()).eq("content",article.getContent());
       Article article1 = articleMapper.selectOne(articleQueryWrapper);
       // 插入分类表
       articleSort.setArticleId(article1.getId());
-      articleSort.setSortId(sort.getId());
+      articleSort.setSortId(sortId);
       articleSortMapper.insert(articleSort);
       // 插入标签表
       articleLable.setArticleId(article1.getId());
-      articleLable.setLableId(lable.getId());
+      articleLable.setLableId(lableId);
       articleLableMapper.insert(articleLable);
       return Result.success(200, "发布成功", article);
     }
@@ -75,7 +86,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article>
     articleSortMapper.delete(articleSortQueryWrapper);
     // 插入新的分类
     articleSort.setArticleId(article.getId());
-    articleSort.setSortId(sort.getId());
+    articleSort.setSortId(sortId);
     articleSortMapper.insert(articleSort);
     //删除之前的标签
     QueryWrapper<ArticleLable> articleLableQueryWrapper=new QueryWrapper<>();
@@ -83,7 +94,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article>
     articleLableMapper.delete(articleLableQueryWrapper);
     // 插入标签表
     articleLable.setArticleId(article.getId());
-    articleLable.setLableId(lable.getId());
+    articleLable.setLableId(lableId);
     articleLableMapper.insert(articleLable);
     return Result.success(200, "修改成功", articleMapper.updateById(article));
   }

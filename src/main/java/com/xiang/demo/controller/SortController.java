@@ -33,7 +33,11 @@ public class SortController {
     public Result getAllSortsAndPages(@RequestBody Page page, @RequestParam String searchField){
         return sortService.getAllSortsAndPages(page,searchField);
     }
-
+    @ApiOperation(value = "查询所有分类不分页")
+    @GetMapping()
+    public Result getAllSort(){
+        return Result.success(200,"查询成功",sortService.list());
+    }
     @ApiOperation(value = "新增或修改分类")
     @PutMapping
     public Result insertOrUpdateSortById(@RequestBody Sort sort){

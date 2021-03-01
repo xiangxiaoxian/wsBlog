@@ -76,7 +76,7 @@ public class SortServiceImpl extends ServiceImpl<SortMapper, Sort> implements So
   public Result getAllSortsAndPages(Page page, String searchField) {
     QueryWrapper<Sort> queryWrapper = new QueryWrapper<>();
     queryWrapper.like("sort_name",searchField);
-    return Result.success(200, "查询成功", (Page<Sort>) sortMapper.selectMapsPage(page, queryWrapper));
+    return Result.success(200, "查询成功", sortMapper.selectPage(page, queryWrapper));
   }
 
   // 根据类别id查询当前分类下所有文章并进行分页

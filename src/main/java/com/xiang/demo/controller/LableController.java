@@ -34,6 +34,12 @@ public class LableController {
         return lableService.getAllLablesAndPages(page,searchField);
     }
 
+    @ApiOperation(value = "查询所有标签不分页")
+    @GetMapping()
+    public Result getAllLables(){
+        return Result.success(200,"查询成功",lableService.list());
+    }
+
     @ApiOperation(value = "新增或修改标签")
     @PutMapping
     public Result insertOrUpdateLableById(@RequestBody Lable lable){

@@ -42,7 +42,7 @@ public class LableServiceImpl extends ServiceImpl<LableMapper, Lable> implements
     public Result getAllLablesAndPages(Page page,String searchField) {
         QueryWrapper<Lable> queryWrapper = new QueryWrapper<>();
         queryWrapper.like("lable_name",searchField);
-        return Result.success(200,"查询成功",(Page<Lable>)lableMapper.selectMapsPage(page,queryWrapper));
+        return Result.success(200,"查询成功",lableMapper.selectPage(page,queryWrapper));
     }
 
     //新增或修改标签
@@ -90,4 +90,6 @@ public class LableServiceImpl extends ServiceImpl<LableMapper, Lable> implements
         Page<Article> articleList = lableMapper.getArticlesBySortIdAndPage(id, page);
         return Result.success(200, "success", articleList);
     }
+
+
 }
