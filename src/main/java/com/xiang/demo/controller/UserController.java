@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * @author XR
@@ -60,5 +61,10 @@ public class UserController {
     return userService.assignRoles(userId, batchRoleIds);
   }
 
+  @ApiOperation(value = "检查用户原密码是否正确")
+  @PostMapping("updatePassword")
+  public Result updatePassword(@RequestBody Map<String, Object> data) {
+    return userService.updatePassword(data);
+  }
 
 }

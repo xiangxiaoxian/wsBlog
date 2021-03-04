@@ -1,6 +1,7 @@
 package com.xiang.demo.service.impl;
 
 import cn.hutool.crypto.SecureUtil;
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xiang.common.Result;
@@ -165,6 +166,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     return Result.success(200, "分配成功", null);
   }
 
+  //验证码发送，用于注册
   @Override
   public Result validationSend(String email) {
     // 验证该邮箱是否被注册
@@ -190,6 +192,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
   }
 
+  //忘记密码，验证码
   @Override
   public Result forgotPasswordByVerificationCode(User user) {
     // 验证该邮箱是否被注册
@@ -217,5 +220,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
       e.printStackTrace();
       return Result.error(400, "发送失败");
     }
+  }
+
+  @Override
+  public Result updatePassword(Map<String, Object> data) {
+    User user= JSON.parseObject(JSON.toJSONString(data.get("user")),User.class);
+    String oldPassword=SecureUtil.md5(data.get("oldPassword").toString());//获取前端的原密码并加密
+    // 验证原密码是否正确
+    QueryWrapper<User> wrapperByPassword = new QueryWrapper<User>();
+    wrapperByPassword.eq("password", oldPassword).eq("id",user.getId());
+    if (!ObjectUtils.isEmpty(userMapper.selectOne(wrapperByPassword))){//查询原密码正确
+      User user1=new User();
+      user1.setPassword(SecureUtil.md5(user.getPassword()));
+      user1.setId(user.getId());
+      userMapper.updateById(user1);
+      return Result.success(200,"修改成功",null);
+    }
+    return Result.error(400,"原密码不正确");
   }
 }

@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * <p>
@@ -36,4 +37,6 @@ public interface UserService extends IService<User> {
     Result validationSend(String email);
 
     Result forgotPasswordByVerificationCode(User user);
+
+    Result updatePassword(Map<String, Object> data);
 }
