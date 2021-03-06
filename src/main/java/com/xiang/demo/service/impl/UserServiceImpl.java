@@ -19,10 +19,14 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.FileSystemUtils;
 import org.springframework.util.ObjectUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -230,6 +234,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     QueryWrapper<User> wrapperByPassword = new QueryWrapper<User>();
     wrapperByPassword.eq("password", oldPassword).eq("id",user.getId());
     if (!ObjectUtils.isEmpty(userMapper.selectOne(wrapperByPassword))){//查询原密码正确
+      //检测新密码和旧密码是否相同
+      if(oldPassword.equals(SecureUtil.md5(user.getPassword()))){
+        return Result.error(400,"新密码和旧密码不能一致");
+      }
       User user1=new User();
       user1.setPassword(SecureUtil.md5(user.getPassword()));
       user1.setId(user.getId());
@@ -237,5 +245,39 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
       return Result.success(200,"修改成功",null);
     }
     return Result.error(400,"原密码不正确");
+  }
+
+  @Override
+  public Result avatarUpload(MultipartFile file, Long id) {
+    String fileName = SecureUtil.md5(id.toString())+".jpg";//文件名
+    String suffixName = fileName.substring(fileName.lastIndexOf("."));//文件后缀
+    String filePath = "E:/wsBlogAvatar/"; // 上传后的路径
+    QueryWrapper<User> queryWrapper=new QueryWrapper<>();
+    queryWrapper.eq("id",id);
+    String avatar=userMapper.selectOne(queryWrapper).getAvatar();
+    if (!ObjectUtils.isEmpty(avatar)){//查询是否以及上传头像
+      FileSystemUtils.deleteRecursively(new File(avatar));
+    }
+    File dest = new File(filePath + fileName);
+    try {
+      file.transferTo(dest);
+      User user=new User();
+      user.setId(id);
+      user.setAvatar(SecureUtil.md5(id.toString()));
+      userMapper.updateById(user);
+      return Result.success(200,"上传成功",user.getAvatar());
+    } catch (IOException e) {
+     e.printStackTrace();
+    }
+    return Result.error(400,"上传失败");
+  }
+
+  @Override
+  public Result updateNickName(User user) {
+    User userForNickName=new User();
+    userForNickName.setId(user.getId());
+    userForNickName.setNickName(user.getNickName());
+    userMapper.updateById(userForNickName);
+    return Result.success(200,"修改成功",null);
   }
 }

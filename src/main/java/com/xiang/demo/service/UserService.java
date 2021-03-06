@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xiang.common.Result;
 import com.xiang.demo.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.Collection;
@@ -39,4 +40,8 @@ public interface UserService extends IService<User> {
     Result forgotPasswordByVerificationCode(User user);
 
     Result updatePassword(Map<String, Object> data);
+
+    Result avatarUpload(MultipartFile file, Long id);
+
+    Result updateNickName(User user);
 }

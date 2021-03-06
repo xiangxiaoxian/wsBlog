@@ -9,6 +9,7 @@
         <result property="phoneNumber" column="phone_number"/>
         <result property="avatar" column="avatar"/>
         <result property="status" column="status"/>
+        <result property="nickName" column="nick_name"/>
         <collection property="roles" ofType="com.xiang.demo.entity.Role">
             <result property="roleName" column="role_name"/>
             <result property="roleComments" column="role_comments"/>

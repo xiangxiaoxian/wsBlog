@@ -6,9 +6,12 @@ import com.xiang.demo.entity.User;
 import com.xiang.demo.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 
@@ -61,10 +64,24 @@ public class UserController {
     return userService.assignRoles(userId, batchRoleIds);
   }
 
-  @ApiOperation(value = "检查用户原密码是否正确")
+  @ApiOperation(value = "修改密码")
+  @RequiresAuthentication
   @PostMapping("updatePassword")
   public Result updatePassword(@RequestBody Map<String, Object> data) {
     return userService.updatePassword(data);
+  }
+
+  @ApiOperation(value = "修改头像")
+  @RequiresAuthentication
+  @PostMapping("/avatarUpload/{id}")
+  public Result avatarUpload(@RequestParam("file") MultipartFile file,@PathVariable Long id) {
+    return userService.avatarUpload(file,id);
+  }
+  @ApiOperation(value = "修改昵称")
+  @RequiresAuthentication
+  @PostMapping("updateNickName")
+  public Result updateNickName(@RequestBody User user) {
+    return userService.updateNickName(user);
   }
 
 }
