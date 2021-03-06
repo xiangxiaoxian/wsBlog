@@ -255,7 +255,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     QueryWrapper<User> queryWrapper=new QueryWrapper<>();
     queryWrapper.eq("id",id);
     String avatar=userMapper.selectOne(queryWrapper).getAvatar();
-    if (!ObjectUtils.isEmpty(avatar)){//查询是否以及上传头像
+    if (!ObjectUtils.isEmpty(avatar)){//查询是否已经上传过头像
       FileSystemUtils.deleteRecursively(new File(avatar));
     }
     File dest = new File(filePath + fileName);
