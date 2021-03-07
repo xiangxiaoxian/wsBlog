@@ -36,4 +36,6 @@ public interface ArticleMapper extends BaseMapper<Article> {
     void upCommentsByArticleId(Long articleId);
 
     void lowCommentsByArticleId(Long articleId);
+
+    Page<Article> getArticleByUserId(Page page,@Param(Constants.WRAPPER) QueryWrapper<Article> articleQueryWrapper);
 }

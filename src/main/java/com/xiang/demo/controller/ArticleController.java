@@ -64,4 +64,11 @@ public class ArticleController {
   public Result lowStar(@PathVariable Long id) {
     return articleService.lowStar(id);
   }
+
+  @ApiOperation(value = "根据用户id查询文章")
+  @PostMapping("/user/{id}")
+  public Result getArticleByUserId(@PathVariable Long id,@RequestBody Page page) {
+    return articleService.getArticleByUserId(page,id);
+  }
+
 }

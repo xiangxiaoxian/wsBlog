@@ -133,4 +133,13 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article>
     articleMapper.lowStar(id);
     return Result.success(200,"success",null);
   }
+
+  //根据用户id查询文章
+  @Override
+  public Result getArticleByUserId(Page page,Long id) {
+    QueryWrapper<Article> articleQueryWrapper = new QueryWrapper<>();
+    articleQueryWrapper.like("user_id", id);
+    Page<Article> articlePage = articleMapper.getArticleByUserId(page, articleQueryWrapper);
+    return Result.success(200,"查询成功",articlePage);
+  }
 }

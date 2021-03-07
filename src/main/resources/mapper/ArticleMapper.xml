@@ -12,6 +12,7 @@
         <result property="browse" column="browse"/>
         <association property="user" javaType="com.xiang.demo.entity.User">
             <result property="nickName" column="nickName"/>
+            <result property="avatar" column="avatar"/>
         </association>
         <collection property="comments" ofType="com.xiang.demo.entity.Comments">
             <id property="id" column="commentsId"/>
@@ -63,7 +64,7 @@
     <!--查询单条文章详情-->
     <select id="getArticleByArticleId" resultMap="article">
         SELECT a.id,a.browse,a.content,a.pub_time,a.reply,a.star,a.title,a.user_id,
-        u.nick_name as nickName,
+        u.nick_name as nickName,u.avatar
         c.comments_date as commentsDate ,c.star as cStar,c.content as cContent,c.parent_comments_id as parentCommentsId,
         us.nick_name as cNickName,us.id as userId
         from article a
@@ -72,5 +73,12 @@
         LEFT JOIN `user` us on c.user_id=us.id
         where a.id=#{id}
         ORDER BY a.id
+    </select>
+    <!--根据用户id查询文章-->
+    <select id="getArticleByUserId" resultMap="article">
+        SELECT a.id,a.browse,a.content,a.pub_time,a.reply,a.star,a.title,a.user_id,u.nick_name as nickName,u.avatar
+        from article a
+        LEFT JOIN `user` u on a.user_id=u.id
+        ${ew.customSqlSegment}
     </select>
 </mapper>

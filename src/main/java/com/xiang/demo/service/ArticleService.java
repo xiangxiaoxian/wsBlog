@@ -31,4 +31,6 @@ public interface ArticleService extends IService<Article> {
     Result upStarOne(Long id);
 
     Result lowStar(Long id);
+
+    Result getArticleByUserId(Page page,Long id);
 }

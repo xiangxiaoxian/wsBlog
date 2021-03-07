@@ -54,9 +54,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     wrapper
         .eq("username", user.getUsername())
         .or()
-        .eq("email", user.getUsername())
-        .or()
-        .eq("phone_number", user.getUsername());
+        .eq("email", user.getUsername());
     User loginUser = userMapper.login(wrapper); // 按照用户名或邮箱或电话号码查询账号信息
     if (ObjectUtils.isEmpty(loginUser)) {
       return Result.error(400, "用户不存在");
@@ -92,6 +90,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
       if (!ObjectUtils.isEmpty(userMapper.selectOne(wrapperByNickName))) {
         return Result.error(400, "昵称已被占用");
       }
+      user.setAvatar("001");
       userMapper.insert(user);
       userRole.setUserId(userMapper.selectOne(wrapper).getId()); // 对注册的用户进行角色分配
       userRole.setRoleId(new Long(3));
