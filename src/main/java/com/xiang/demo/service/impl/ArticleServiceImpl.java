@@ -40,7 +40,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article>
   @Override
   public Result getAllArticlesAndPages(Page page, String searchField) {
     QueryWrapper<Article> articleQueryWrapper = new QueryWrapper<>();
-    articleQueryWrapper.like("title", searchField);
+    articleQueryWrapper.like("title", searchField).eq("deleted",0);
     Page<Article> articlePage = articleMapper.getAllArticlesAndPages(page, articleQueryWrapper);
     return Result.success(200, "查询成功", articlePage);
   }
@@ -138,7 +138,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article>
   @Override
   public Result getArticleByUserId(Page page,Long id) {
     QueryWrapper<Article> articleQueryWrapper = new QueryWrapper<>();
-    articleQueryWrapper.like("user_id", id);
+    articleQueryWrapper.eq("user_id", id).eq("a.deleted",0);
     Page<Article> articlePage = articleMapper.getArticleByUserId(page, articleQueryWrapper);
     return Result.success(200,"查询成功",articlePage);
   }

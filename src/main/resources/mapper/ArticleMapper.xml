@@ -14,6 +14,14 @@
             <result property="nickName" column="nickName"/>
             <result property="avatar" column="avatar"/>
         </association>
+        <association property="sort" javaType="com.xiang.demo.entity.Sort">
+            <result property="id" column="sortId"/>
+            <result property="sortName" column="sortName"/>
+        </association>
+        <association property="lable" javaType="com.xiang.demo.entity.Lable">
+            <result property="id" column="lableId"/>
+            <result property="lableName" column="lableName"/>
+        </association>
         <collection property="comments" ofType="com.xiang.demo.entity.Comments">
             <id property="id" column="commentsId"/>
             <result property="commentsDate" column="commentsDate"/>
@@ -64,14 +72,20 @@
     <!--查询单条文章详情-->
     <select id="getArticleByArticleId" resultMap="article">
         SELECT a.id,a.browse,a.content,a.pub_time,a.reply,a.star,a.title,a.user_id,
-        u.nick_name as nickName,u.avatar
+        u.nick_name as nickName,u.avatar,
         c.comments_date as commentsDate ,c.star as cStar,c.content as cContent,c.parent_comments_id as parentCommentsId,
-        us.nick_name as cNickName,us.id as userId
+        us.nick_name as cNickName,us.id as userId,
+		s.id as sortId,s.sort_name as sortName,
+		l.id as lableId,l.lable_name as lableName
         from article a
         LEFT JOIN `user` u on a.user_id=u.id
         LEFT JOIN comments c on a.id=c.article_id
         LEFT JOIN `user` us on c.user_id=us.id
-        where a.id=#{id}
+		LEFT JOIN article_sort ar on ar.article_id=a.id
+		LEFT JOIN sort s on s.id=ar.sort_id
+		LEFT JOIN article_lable al on al.article_id=a.id
+		LEFT JOIN lable l on l.id=al.lable_id
+        where a.id=#{id} and a.deleted=0
         ORDER BY a.id
     </select>
     <!--根据用户id查询文章-->
