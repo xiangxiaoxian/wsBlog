@@ -11,7 +11,7 @@ spring:
     username: root
     password: 123456
   jackson:
-    date-format: yyyy-MM-dd HH:mm:ss
+    date-format: yyyy-MM-dd
     time-zone: GMT+8
   profiles:
     active: dev

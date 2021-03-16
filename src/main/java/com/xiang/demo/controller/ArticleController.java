@@ -42,6 +42,7 @@ public class ArticleController {
   }
 
   @ApiOperation(value = "新增或修改文章")
+  @RequiresAuthentication
   @PutMapping()
   public Result insertOrUpdateArticleByArticleId(@RequestBody Map<String, Object> data) {
     return articleService.insertOrUpdateArticleByArticleId(data);

@@ -22,7 +22,7 @@
     </resultMap>
     <select id="login" resultMap="user">
         SELECT
-          u.id,u.username,u.`password`,u.avatar,u.nick_name,u.status,r.role_name,r.role_comments,p.permission_name,p.permission_comments,p.address
+          u.id,u.username,u.`password`,u.avatar,u.nick_name,u.status,u.email,r.role_name,r.role_comments,p.permission_name,p.permission_comments,p.address
           FROM
           `user` u
           LEFT JOIN

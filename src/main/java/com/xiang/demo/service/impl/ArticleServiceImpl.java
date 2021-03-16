@@ -63,7 +63,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article>
     Long lableId=Long.valueOf(data.get("lableId").toString());
     System.out.println(lableId);
     if (ObjectUtils.isEmpty(article.getId())) { // 判断传递的实体id是否为空
-      article.setPubTime(LocalDateTime.now());
+      article.setPubTime(new Date());
       articleMapper.insert(article);
       // 查询刚插入的数据
       QueryWrapper<Article> articleQueryWrapper = new QueryWrapper<>();

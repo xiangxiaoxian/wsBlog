@@ -90,7 +90,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
       if (!ObjectUtils.isEmpty(userMapper.selectOne(wrapperByNickName))) {
         return Result.error(400, "昵称已被占用");
       }
-      user.setAvatar("001");
+      user.setAvatar("001.jpg");
       userMapper.insert(user);
       userRole.setUserId(userMapper.selectOne(wrapper).getId()); // 对注册的用户进行角色分配
       userRole.setRoleId(new Long(3));
@@ -246,6 +246,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     return Result.error(400,"原密码不正确");
   }
 
+  //头像修改
   @Override
   public Result avatarUpload(MultipartFile file, Long id) {
     String fileName = SecureUtil.md5(id.toString())+".jpg";//文件名
@@ -260,15 +261,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     File dest = new File(filePath + fileName);
     try {
       file.transferTo(dest);
-      User user=new User();
-      user.setId(id);
-      user.setAvatar(SecureUtil.md5(id.toString()));
-      userMapper.updateById(user);
-      return Result.success(200,"上传成功",user.getAvatar());
     } catch (IOException e) {
      e.printStackTrace();
+      return Result.error(400,"上传失败");
     }
-    return Result.error(400,"上传失败");
+    User user=new User();
+    user.setId(id);
+    user.setAvatar(SecureUtil.md5(id.toString())+suffixName);
+    userMapper.updateById(user);
+    return Result.success(200,"上传成功",user.getAvatar());
   }
 
   @Override

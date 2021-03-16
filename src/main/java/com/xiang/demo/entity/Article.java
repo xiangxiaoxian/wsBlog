@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.time.LocalDateTime;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 import lombok.Data;
@@ -41,8 +42,8 @@ public class Article implements Serializable {
   private String content;
 
   /** 发布时间 */
-  @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm:ss")
-  private LocalDateTime pubTime;
+  @DateTimeFormat(pattern = "yyyy-MM-dd")
+  private Date pubTime;
 
   /** 点赞数 */
   private Long star;
