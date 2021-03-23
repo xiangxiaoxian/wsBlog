@@ -22,17 +22,6 @@
             <result property="id" column="lableId"/>
             <result property="lableName" column="lableName"/>
         </association>
-        <collection property="comments" ofType="com.xiang.demo.entity.Comments">
-            <id property="id" column="commentsId"/>
-            <result property="commentsDate" column="commentsDate"/>
-            <result property="star" column="cStar"/>
-            <result property="content" column="cContent"/>
-            <result property="parentCommentsId" column="parentCommentsId"/>
-            <association property="commentsUser" javaType="com.xiang.demo.entity.User">
-                <id property="id" column="userId"/>
-                <result property="nickName" column="cNickName"/>
-            </association>
-        </collection>
     </resultMap>
     <!--对浏览记录加1-->
     <update id="upBrowseOne">
@@ -63,24 +52,21 @@
     </select>
     <!--查询全部文章按条件-->
     <select id="getAllArticlesAndPages" resultMap="article">
-        SELECT a.id,a.browse,a.content,a.pub_time,a.reply,a.star,a.title,a.user_id,u.nick_name as nickName
+        SELECT a.id,a.browse,a.content,a.pub_time,a.reply,a.star,a.title,a.user_id,u.nick_name as nickName,u.avatar
         from article a
         LEFT JOIN `user` u on a.user_id=u.id
         ${ew.customSqlSegment}
+        order by a.pub_time desc
     </select>
 
     <!--查询单条文章详情-->
     <select id="getArticleByArticleId" resultMap="article">
         SELECT a.id,a.browse,a.content,a.pub_time,a.reply,a.star,a.title,a.user_id,
         u.nick_name as nickName,u.avatar,
-        c.comments_date as commentsDate ,c.star as cStar,c.content as cContent,c.parent_comments_id as parentCommentsId,
-        us.nick_name as cNickName,us.id as userId,
 		s.id as sortId,s.sort_name as sortName,
 		l.id as lableId,l.lable_name as lableName
         from article a
         LEFT JOIN `user` u on a.user_id=u.id
-        LEFT JOIN comments c on a.id=c.article_id
-        LEFT JOIN `user` us on c.user_id=us.id
 		LEFT JOIN article_sort ar on ar.article_id=a.id
 		LEFT JOIN sort s on s.id=ar.sort_id
 		LEFT JOIN article_lable al on al.article_id=a.id
@@ -94,5 +80,33 @@
         from article a
         LEFT JOIN `user` u on a.user_id=u.id
         ${ew.customSqlSegment}
+        order by a.id desc
+    </select>
+    <!--查询浏览量前20的文章不分页-->
+    <select id="getArticleTop20" resultMap="article">
+        SELECT a.id,a.browse,a.content,a.pub_time,a.reply,a.star,a.title,a.user_id,u.nick_name as nickName,u.avatar
+        from article a
+        LEFT JOIN `user` u on a.user_id=u.id
+        where a.deleted=0
+        order by a.browse desc
+        limit 20
+    </select>
+    <!--根据类别id查询当前分类下所有文章并进行分页-->
+    <select id="getArticlesBySortIdAndPage" resultMap="article">
+        SELECT a.id,a.browse,a.content,a.pub_time,a.reply,a.star,a.title,a.user_id,u.nick_name as nickName,u.avatar
+        FROM article_sort ao
+        LEFT JOIN article a on ao.article_id=a.id
+        LEFT JOIN `user` u on a.user_id=u.id
+        WHERE ao.sort_id=#{id} and a.deleted=0
+        ORDER BY ao.sort_id
+    </select>
+    <!--根据标签id查询当前分类下所有文章并进行分页-->
+    <select id="getArticlesByLableIdAndPage" resultMap="article">
+        SELECT a.id,a.browse,a.content,a.pub_time,a.reply,a.star,a.title,a.user_id,u.nick_name as nickName,u.avatar
+        FROM article_lable al
+        LEFT JOIN article a on al.article_id=a.id
+        LEFT JOIN `user` u on a.user_id=u.id
+        WHERE al.lable_id=#{id} and a.deleted=0
+        ORDER BY al.lable_id
     </select>
 </mapper>

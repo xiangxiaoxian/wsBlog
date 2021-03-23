@@ -17,6 +17,4 @@ import java.util.List;
  */
 public interface LableMapper extends BaseMapper<Lable> {
 
-    Page<Article> getArticlesBySortIdAndPage(Long id, Page page);
-
 }

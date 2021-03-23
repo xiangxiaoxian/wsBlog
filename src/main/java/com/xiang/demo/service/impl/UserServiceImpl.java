@@ -226,6 +226,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
   }
 
   @Override
+  @Transactional
   public Result updatePassword(Map<String, Object> data) {
     User user= JSON.parseObject(JSON.toJSONString(data.get("user")),User.class);
     String oldPassword=SecureUtil.md5(data.get("oldPassword").toString());//获取前端的原密码并加密
@@ -248,9 +249,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
   //头像修改
   @Override
+  @Transactional
   public Result avatarUpload(MultipartFile file, Long id) {
     String fileName = SecureUtil.md5(id.toString())+".jpg";//文件名
-    String suffixName = fileName.substring(fileName.lastIndexOf("."));//文件后缀
     String filePath = "E:/wsBlogAvatar/"; // 上传后的路径
     QueryWrapper<User> queryWrapper=new QueryWrapper<>();
     queryWrapper.eq("id",id);
@@ -261,18 +262,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     File dest = new File(filePath + fileName);
     try {
       file.transferTo(dest);
-    } catch (IOException e) {
+    } catch (Exception e) {
      e.printStackTrace();
       return Result.error(400,"上传失败");
     }
     User user=new User();
     user.setId(id);
-    user.setAvatar(SecureUtil.md5(id.toString())+suffixName);
+    user.setAvatar(fileName);
     userMapper.updateById(user);
     return Result.success(200,"上传成功",user.getAvatar());
   }
 
   @Override
+  @Transactional
   public Result updateNickName(User user) {
     User userForNickName=new User();
     userForNickName.setId(user.getId());

@@ -32,8 +32,14 @@ public class CommentsController {
   }
 
   @ApiOperation(value = "删除评论")
-  @PostMapping()
-  public Result deleteCommentsById(@RequestBody Comments comments) {
-    return commentsService.deleteCommentsById(comments);
+  @DeleteMapping("/{id}")
+  public Result deleteCommentsById(@PathVariable Long id,@RequestParam("articleId") Long articleId) {
+    return commentsService.deleteCommentsById(id,articleId);
+  }
+
+  @ApiOperation(value = "根据文章id查询该文章下评论")
+  @GetMapping("{articleId}")
+  public Result selectCommentsByArticleId(@PathVariable Long articleId) {
+    return commentsService.selectCommentsByArticleId(articleId);
   }
 }

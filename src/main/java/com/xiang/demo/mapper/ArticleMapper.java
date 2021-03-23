@@ -38,4 +38,10 @@ public interface ArticleMapper extends BaseMapper<Article> {
     void lowCommentsByArticleId(Long articleId);
 
     Page<Article> getArticleByUserId(Page page,@Param(Constants.WRAPPER) QueryWrapper<Article> articleQueryWrapper);
+
+    List<Article> getArticleTop20();
+
+    Page<Article> getArticlesBySortIdAndPage(Long id, Page page);
+
+    Page<Article> getArticlesByLableIdAndPage(Long id, Page page);
 }

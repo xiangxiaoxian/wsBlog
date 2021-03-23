@@ -11,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 评论实现类
@@ -31,6 +33,7 @@ public class CommentsServiceImpl extends ServiceImpl<CommentsMapper, Comments>
   @Transactional
   public Result insertOrUpdateCommentsById(Comments comments) {
     if (ObjectUtils.isEmpty(comments.getId())) { // 判断该实体是否有id
+      comments.setCommentsDate(LocalDateTime.now());
       commentsMapper.insert(comments);
       articleMapper.upCommentsByArticleId(comments.getArticleId());
       return Result.success(200, "评论成功", comments);
@@ -42,9 +45,16 @@ public class CommentsServiceImpl extends ServiceImpl<CommentsMapper, Comments>
   // 删除评论
   @Override
   @Transactional
-  public Result deleteCommentsById(Comments comments) {
-    commentsMapper.deleteById(comments.getId());
-    articleMapper.lowCommentsByArticleId(comments.getArticleId());
+  public Result deleteCommentsById(Long id,Long articleId) {
+    commentsMapper.deleteById(id);
+    articleMapper.lowCommentsByArticleId(articleId);
     return Result.success(200, "评论删除成功", null);
+  }
+
+  //根据文章id查询该文章下评论
+  @Override
+  public Result selectCommentsByArticleId(Long articleId) {
+    List<Comments> commentsList= commentsMapper.selectCommentsByArticleId(articleId);
+    return Result.success(200,"查询成功",commentsList);
   }
 }

@@ -63,11 +63,6 @@ public class Article implements Serializable {
   @TableField(exist = false)
   private User user;
 
-  /*
-   * 评论
-   * */
-  @TableField(exist = false)
-  private List<Comments> comments;
 
   /*
    * 分类

@@ -3,6 +3,7 @@ package com.xiang.demo.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xiang.common.Result;
 import com.xiang.demo.entity.Article;
+import com.xiang.demo.entity.ArticleStar;
 import com.xiang.demo.entity.Lable;
 import com.xiang.demo.entity.Sort;
 import com.xiang.demo.service.ArticleService;
@@ -10,6 +11,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.util.Map;
@@ -31,11 +33,11 @@ public class ArticleController {
 
   @ApiOperation(value = "查询所有文章并分页,用于首页遍历")
   @PostMapping()
-  public Result getAllArticlesAndPages(@RequestBody Page page, @RequestParam String searchField) {
+  public Result getAllArticlesAndPages(@RequestBody Page page, @RequestParam("searchField") String searchField) {
     return articleService.getAllArticlesAndPages(page, searchField);
   }
 
-  @ApiOperation(value = "查询单条文章并分页,用于文章详情")
+  @ApiOperation(value = "查询单条文章,用于文章详情")
   @GetMapping("{id}")
   public Result getArticleByArticleId(@PathVariable Long id) {
     return articleService.getArticleByArticleId(id);
@@ -55,21 +57,39 @@ public class ArticleController {
   }
 
   @ApiOperation(value = "文章点赞数加1")
-  @GetMapping("/upStar/{id}")
-  public Result upStarOne(@PathVariable Long id) {
-    return articleService.upStarOne(id);
+  @PostMapping("/upStar/{id}")
+  public Result upStarOne(@PathVariable Long id, @RequestBody ArticleStar articleStar) {
+    return articleService.upStarOne(id,articleStar);
   }
 
   @ApiOperation(value = "文章点赞数减1")
-  @GetMapping("/lowStar/{id}")
-  public Result lowStar(@PathVariable Long id) {
-    return articleService.lowStar(id);
+  @PostMapping("/lowStar/{id}")
+  public Result lowStar(@PathVariable Long id,@RequestBody ArticleStar articleStar) {
+    return articleService.lowStar(id,articleStar);
   }
 
   @ApiOperation(value = "根据用户id查询文章")
   @PostMapping("/user/{id}")
   public Result getArticleByUserId(@PathVariable Long id,@RequestBody Page page) {
     return articleService.getArticleByUserId(page,id);
+  }
+
+  @ApiOperation(value = "文章内部图片上传")
+  @PostMapping("/imgUpload")
+  public Result imgUpload(@RequestParam(value = "pic", required = false) MultipartFile pic) {
+    return articleService.imgUpload(pic);
+  }
+
+  @ApiOperation(value = "查询当前文章该用户是否点赞")
+  @GetMapping("/starTrueOrFalse/{id}")
+  public Result starTrueOrFalse(@PathVariable Long id,@RequestParam("userId") Long userId) {
+    return articleService.starTrueOrFalse(id,userId);
+  }
+
+  @ApiOperation(value = "查询浏览量前20的文章不分页")
+  @GetMapping()
+  public Result getArticleTop20() {
+    return articleService.getArticleTop20();
   }
 
 }

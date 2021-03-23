@@ -4,6 +4,8 @@ import com.xiang.common.Result;
 import com.xiang.demo.entity.Comments;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
+import java.util.List;
+
 /**
  * <p>
  *  Mapper 接口
@@ -15,4 +17,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 public interface CommentsMapper extends BaseMapper<Comments> {
 
 
+    List<Comments> selectCommentsByArticleId(Long articleId);
 }

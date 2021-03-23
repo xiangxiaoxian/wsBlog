@@ -1,5 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.xiang.demo.mapper.CommentsMapper">
+    <resultMap id="comments" type="com.xiang.demo.entity.Comments">
+        <id property="id" column="id"/>
+        <result property="commentsDate" column="commentsDate"/>
+        <result property="star" column="star"/>
+        <result property="content" column="content"/>
+        <result property="parentCommentsId" column="parentCommentsId"/>
+        <result property="parentCommentsNickName" column="parentCommentsNickName"/>
+        <result property="userId" column="userId"/>
+        <association property="user" javaType="com.xiang.demo.entity.User">
+            <result property="nickName" column="nickName"/>
+            <result property="avatar" column="avatar"/>
+        </association>
+    </resultMap>
 
+    <!--根据文章id查询该文章下评论-->
+    <select id="selectCommentsByArticleId" resultMap="comments">
+        SELECT
+        c.id,c.star,c.comments_date as commentsDate,c.content,c.parent_comments_id as parentCommentsId,c.user_id as userId,c.parent_comments_nick_name as parentCommentsNickName,
+        u.avatar as avatar, u.nick_name as nickName
+        FROM comments c
+        LEFT JOIN `user` u on c.user_id=u.id
+        WHERE c.deleted=0 AND c.article_id=#{articleId}
+        ORDER BY c.comments_date ASC
+    </select>
 </mapper>

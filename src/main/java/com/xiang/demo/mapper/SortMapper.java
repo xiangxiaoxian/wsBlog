@@ -15,5 +15,4 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface SortMapper extends BaseMapper<Sort> {
 
-    Page<Article> getArticlesBySortIdAndPage(Long id, Page page);
 }

@@ -5,10 +5,13 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.time.LocalDateTime;
 import java.io.Serializable;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  * <p>
@@ -35,6 +38,7 @@ public class Comments implements Serializable {
     /**
      * 评论日期
      */
+    @JsonFormat(pattern ="yyyy-MM-dd hh-mm-ss")
     private LocalDateTime commentsDate;
 
     /**
@@ -63,6 +67,11 @@ public class Comments implements Serializable {
     private Long parentCommentsId;
 
     /**
+     * 父评论昵称
+     */
+    private String parentCommentsNickName;
+
+    /**
      * 逻辑删除
      */
     private Integer deleted;
@@ -71,7 +80,6 @@ public class Comments implements Serializable {
      * 用户
      * */
     @TableField(exist = false)
-    private User commentsUser;
-
+    private User user;
 
 }

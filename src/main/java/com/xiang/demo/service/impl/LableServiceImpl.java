@@ -7,6 +7,7 @@ import com.xiang.demo.entity.Article;
 import com.xiang.demo.entity.ArticleLable;
 import com.xiang.demo.entity.Lable;
 import com.xiang.demo.mapper.ArticleLableMapper;
+import com.xiang.demo.mapper.ArticleMapper;
 import com.xiang.demo.mapper.LableMapper;
 import com.xiang.demo.service.LableService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -34,6 +35,9 @@ public class LableServiceImpl extends ServiceImpl<LableMapper, Lable> implements
 
     @Resource
     private ArticleLableMapper articleLableMapper;
+
+    @Resource
+    private ArticleMapper articleMapper;
 
 
 
@@ -87,7 +91,7 @@ public class LableServiceImpl extends ServiceImpl<LableMapper, Lable> implements
     //根据类别id查询当前标签下所有文章并进行分页
     @Override
     public Result getArticlesByLableIdAndPage(Long id, Page page) {
-        Page<Article> articleList = lableMapper.getArticlesBySortIdAndPage(id, page);
+        Page<Article> articleList = articleMapper.getArticlesByLableIdAndPage(id, page);
         return Result.success(200, "success", articleList);
     }
 

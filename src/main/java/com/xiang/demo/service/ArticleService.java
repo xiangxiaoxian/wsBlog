@@ -4,8 +4,10 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xiang.common.Result;
 import com.xiang.demo.entity.Article;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.xiang.demo.entity.ArticleStar;
 import com.xiang.demo.entity.Lable;
 import com.xiang.demo.entity.Sort;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 
@@ -28,9 +30,15 @@ public interface ArticleService extends IService<Article> {
 
     Result deleteArticleByArticleId(Long id);
 
-    Result upStarOne(Long id);
+    Result upStarOne(Long id, ArticleStar articleStar);
 
-    Result lowStar(Long id);
+    Result lowStar(Long id,ArticleStar articleStar);
 
     Result getArticleByUserId(Page page,Long id);
+
+    Result imgUpload(MultipartFile pic);
+
+    Result starTrueOrFalse(Long id, Long userId);
+
+    Result getArticleTop20();
 }

@@ -33,6 +33,8 @@ public class SortServiceImpl extends ServiceImpl<SortMapper, Sort> implements So
 
   @Resource private ArticleSortMapper articleSortMapper;
 
+  @Resource private ArticleMapper articleMapper;
+
   // 新增或修改分类
   @Override
   @Transactional
@@ -75,14 +77,14 @@ public class SortServiceImpl extends ServiceImpl<SortMapper, Sort> implements So
   @Override
   public Result getAllSortsAndPages(Page page, String searchField) {
     QueryWrapper<Sort> queryWrapper = new QueryWrapper<>();
-    queryWrapper.like("sort_name",searchField);
+    queryWrapper.like("sort_name", searchField);
     return Result.success(200, "查询成功", sortMapper.selectPage(page, queryWrapper));
   }
 
   // 根据类别id查询当前分类下所有文章并进行分页
   @Override
   public Result getArticlesBySortIdAndPage(Long id, Page page) {
-    Page<Article> articleList = sortMapper.getArticlesBySortIdAndPage(id, page);
+    Page<Article> articleList = articleMapper.getArticlesBySortIdAndPage(id, page);
     return Result.success(200, "success", articleList);
   }
 }
