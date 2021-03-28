@@ -32,6 +32,12 @@ public class RoleController {
     return roleService.getAllRolesAndPages(page,searchField);
   }
 
+  @ApiOperation(value = "查询所有角色不分页")
+  @GetMapping()
+  public Result getAllRoles(){
+    return Result.success(200,"success",roleService.list());
+  }
+
   @ApiOperation(value = "新增或修改角色")
   @PutMapping
   public Result insertOrUpdateRoleById(@RequestBody Role role) {

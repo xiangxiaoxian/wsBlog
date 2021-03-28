@@ -17,7 +17,7 @@ import javax.validation.constraints.Email;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author XR
@@ -82,7 +82,7 @@ public class User implements Serializable {
     * 角色列表
     * */
     @TableField(exist = false)
-    private List<Role> roles;
+    private Role roles;
 
 
 

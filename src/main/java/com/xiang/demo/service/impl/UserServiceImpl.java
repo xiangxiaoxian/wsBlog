@@ -51,10 +51,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
   @Override
   public Result login(User user, HttpServletResponse response) {
     QueryWrapper<Map<String, Object>> wrapper = new QueryWrapper<>();
-    wrapper
-        .eq("username", user.getUsername())
-        .or()
-        .eq("email", user.getUsername());
+    wrapper.eq("username", user.getUsername()).or().eq("email", user.getUsername());
     User loginUser = userMapper.login(wrapper); // 按照用户名或邮箱或电话号码查询账号信息
     if (ObjectUtils.isEmpty(loginUser)) {
       return Result.error(400, "用户不存在");
@@ -78,7 +75,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
   public Result registerOrUpdateUserById(User user) {
     // 对密码进行md5加密
     user.setPassword(SecureUtil.md5(user.getPassword()));
-    if (null == user.getId()) { // 根据实体有无id进行资料修改或注册判断
+    if (ObjectUtils.isEmpty(user.getId())) { // 根据实体有无id进行资料修改或注册判断
       UserRole userRole = new UserRole();
       QueryWrapper<User> wrapper = new QueryWrapper<User>();
       wrapper.lambda().eq(User::getUsername, user.getUsername()); // 根据用户名查询当前用户是否被注册
@@ -99,7 +96,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     } else {
       QueryWrapper<User> wrapperByEmail = new QueryWrapper<User>();
       wrapperByEmail.eq("email", user.getEmail());
-      if (!ObjectUtils.isEmpty(userMapper.selectOne(wrapperByEmail))) {
+      if (!userMapper.selectOne(wrapperByEmail).getId().equals(user.getId())) {
         return Result.error(400, "该邮箱已被使用，请更换邮箱，若忘记密码，请修改密码");
       }
       userMapper.updateById(user);
@@ -147,14 +144,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
   @Override
   public Result getAllUserAndPages(Page page, String searchField) {
     QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-    queryWrapper.like("nick_name", searchField);
-    return Result.success(200, "查询成功", (Page<User>) userMapper.selectMapsPage(page, queryWrapper));
+    queryWrapper.like("nick_name", searchField).eq("r.role_name", "用户").eq("ur.deleted", 0).eq("r.deleted",0);
+    return Result.success(200, "查询成功", userMapper.selectAllUserBySearchField(page, queryWrapper));
   }
 
   // 给用户分配角色
   @Override
   @Transactional
-  public Result assignRoles(Long userId, Collection<Long> batchRoleIds) {
+  public Result assignRoles(Long userId, Long roleId) {
     // 删除前先删除该用户之前拥有的角色列表
     QueryWrapper<UserRole> wrapperByUserRole = new QueryWrapper<>();
     wrapperByUserRole.eq("user_id", userId);
@@ -162,14 +159,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     // 分配新的角色
     UserRole userRole = new UserRole();
     userRole.setUserId(userId);
-    for (Long roleId : batchRoleIds) {
-      userRole.setRoleId(roleId);
-      userRoleMapper.insert(userRole);
-    }
+    userRole.setRoleId(roleId);
+    userRoleMapper.insert(userRole);
     return Result.success(200, "分配成功", null);
   }
 
-  //验证码发送，用于注册
+  // 验证码发送，用于注册
   @Override
   public Result validationSend(String email) {
     // 验证该邮箱是否被注册
@@ -195,7 +190,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
   }
 
-  //忘记密码，验证码
+  // 忘记密码，验证码
   @Override
   public Result forgotPasswordByVerificationCode(User user) {
     // 验证该邮箱是否被注册
@@ -228,58 +223,71 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
   @Override
   @Transactional
   public Result updatePassword(Map<String, Object> data) {
-    User user= JSON.parseObject(JSON.toJSONString(data.get("user")),User.class);
-    String oldPassword=SecureUtil.md5(data.get("oldPassword").toString());//获取前端的原密码并加密
+    User user = JSON.parseObject(JSON.toJSONString(data.get("user")), User.class);
+    String oldPassword = SecureUtil.md5(data.get("oldPassword").toString()); // 获取前端的原密码并加密
     // 验证原密码是否正确
     QueryWrapper<User> wrapperByPassword = new QueryWrapper<User>();
-    wrapperByPassword.eq("password", oldPassword).eq("id",user.getId());
-    if (!ObjectUtils.isEmpty(userMapper.selectOne(wrapperByPassword))){//查询原密码正确
-      //检测新密码和旧密码是否相同
-      if(oldPassword.equals(SecureUtil.md5(user.getPassword()))){
-        return Result.error(400,"新密码和旧密码不能一致");
+    wrapperByPassword.eq("password", oldPassword).eq("id", user.getId());
+    if (!ObjectUtils.isEmpty(userMapper.selectOne(wrapperByPassword))) { // 查询原密码正确
+      // 检测新密码和旧密码是否相同
+      if (oldPassword.equals(SecureUtil.md5(user.getPassword()))) {
+        return Result.error(400, "新密码和旧密码不能一致");
       }
-      User user1=new User();
+      User user1 = new User();
       user1.setPassword(SecureUtil.md5(user.getPassword()));
       user1.setId(user.getId());
       userMapper.updateById(user1);
-      return Result.success(200,"修改成功",null);
+      return Result.success(200, "修改成功", null);
     }
-    return Result.error(400,"原密码不正确");
+    return Result.error(400, "原密码不正确");
   }
 
-  //头像修改
+  // 头像修改
   @Override
   @Transactional
   public Result avatarUpload(MultipartFile file, Long id) {
-    String fileName = SecureUtil.md5(id.toString())+".jpg";//文件名
+    String fileName = SecureUtil.md5(id.toString()) + ".jpg"; // 文件名
     String filePath = "E:/wsBlogAvatar/"; // 上传后的路径
-    QueryWrapper<User> queryWrapper=new QueryWrapper<>();
-    queryWrapper.eq("id",id);
-    String avatar=userMapper.selectOne(queryWrapper).getAvatar();
-    if (!ObjectUtils.isEmpty(avatar)){//查询是否已经上传过头像
+    QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+    queryWrapper.eq("id", id);
+    String avatar = userMapper.selectOne(queryWrapper).getAvatar();
+    if (!ObjectUtils.isEmpty(avatar)) { // 查询是否已经上传过头像
       FileSystemUtils.deleteRecursively(new File(avatar));
     }
     File dest = new File(filePath + fileName);
     try {
       file.transferTo(dest);
     } catch (Exception e) {
-     e.printStackTrace();
-      return Result.error(400,"上传失败");
+      e.printStackTrace();
+      return Result.error(400, "上传失败");
     }
-    User user=new User();
+    User user = new User();
     user.setId(id);
     user.setAvatar(fileName);
     userMapper.updateById(user);
-    return Result.success(200,"上传成功",user.getAvatar());
+    return Result.success(200, "上传成功", user.getAvatar());
   }
 
+  // 昵称修改
   @Override
   @Transactional
   public Result updateNickName(User user) {
-    User userForNickName=new User();
+    QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+    userQueryWrapper.eq("nick_name", user.getNickName());
+    if (!ObjectUtils.isEmpty(userMapper.selectOne(userQueryWrapper))) {
+      return Result.error(400, "该昵称已被使用");
+    }
+    User userForNickName = new User();
     userForNickName.setId(user.getId());
     userForNickName.setNickName(user.getNickName());
     userMapper.updateById(userForNickName);
-    return Result.success(200,"修改成功",null);
+    return Result.success(200, "修改成功", null);
+  }
+
+  @Override
+  public Result getAllManAndPages(Page page, String searchField) {
+    QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+    queryWrapper.like("nick_name", searchField).ne("r.role_name", "用户").eq("ur.deleted", 0).eq("r.deleted",0);
+    return Result.success(200, "查询成功", userMapper.selectAllUserBySearchField(page, queryWrapper));
   }
 }

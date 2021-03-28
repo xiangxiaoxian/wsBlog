@@ -58,10 +58,16 @@ public class UserController {
     return userService.getAllUserAndPages(page,searchField);
   }
 
+  @ApiOperation(value = "查询所有管理员资料并分页")
+  @PostMapping("/man")
+  public Result getAllManAndPages(@RequestBody Page page,@RequestParam String searchField) {
+    return userService.getAllManAndPages(page,searchField);
+  }
+
   @ApiOperation(value = "给用户分配角色")
-  @PostMapping("/userRole/{userId}")
-  public Result assignRoles(@PathVariable Long userId, @RequestBody Collection<Long> batchRoleIds) {
-    return userService.assignRoles(userId, batchRoleIds);
+  @PostMapping("/userRole/{userId}/{roleId}")
+  public Result assignRoles(@PathVariable Long userId, @PathVariable Long roleId) {
+    return userService.assignRoles(userId, roleId);
   }
 
   @ApiOperation(value = "修改密码")

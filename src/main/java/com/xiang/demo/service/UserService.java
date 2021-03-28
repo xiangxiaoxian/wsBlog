@@ -33,7 +33,7 @@ public interface UserService extends IService<User> {
 
     Result getAllUserAndPages(Page page,String searchField);
 
-    Result assignRoles(Long userId, Collection<Long> batchRoleIds);
+    Result assignRoles(Long userId, Long roleId);
 
     Result validationSend(String email);
 
@@ -44,4 +44,6 @@ public interface UserService extends IService<User> {
     Result avatarUpload(MultipartFile file, Long id);
 
     Result updateNickName(User user);
+
+    Result getAllManAndPages(Page page, String searchField);
 }

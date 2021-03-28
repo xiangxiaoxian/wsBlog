@@ -10,33 +10,23 @@
         <result property="avatar" column="avatar"/>
         <result property="status" column="status"/>
         <result property="nickName" column="nick_name"/>
-        <collection property="roles" ofType="com.xiang.demo.entity.Role">
+        <association property="roles" javaType="com.xiang.demo.entity.Role">
             <result property="roleName" column="role_name"/>
             <result property="roleComments" column="role_comments"/>
-            <collection property="permissions" ofType="com.xiang.demo.entity.Permission">
-                <result property="permissionName" column="permission_name"/>
-                <result property="permissionComments" column="permission_comments"/>
-                <result property="address" column="address"/>
-            </collection>
-        </collection>
+        </association>
     </resultMap>
     <select id="login" resultMap="user">
         SELECT
-          u.id,u.username,u.`password`,u.avatar,u.nick_name,u.status,u.email,r.role_name,r.role_comments,p.permission_name,p.permission_comments,p.address
+          u.id,u.username,u.`password`,u.avatar,u.nick_name,u.status,u.email,r.role_name,r.role_comments
           FROM
           `user` u
           LEFT JOIN
           user_role ur on u.id=ur.user_id
           LEFT JOIN
           role r on ur.role_id=r.id
-          LEFT JOIN
-          role_permission rp on r.id=rp.role_id
-          LEFT JOIN
-          permission p on rp.permission_id=p.id
           ${ew.customSqlSegment}
           and ur.deleted=0
           and u.deleted=0
-          and rp.deleted=0
           order by u.id
     </select>
 
@@ -46,6 +36,13 @@
         LEFT JOIN role r on ur.role_id=r.id
         WHERE u.deleted=0 and ur.deleted=0 and u.id=#{id}
         order by u.id
+    </select>
+    <select id="selectAllUserBySearchField" resultMap="user">
+        SELECT u.id,u.username,u.`password`,u.avatar,u.nick_name,u.status,u.email,r.role_name from `user` u
+        LEFT JOIN user_role ur on u.id=ur.user_id
+        LEFT JOIN role r on ur.role_id=r.id
+        ${ew.customSqlSegment}
+        ORDER BY u.id
     </select>
 
 
