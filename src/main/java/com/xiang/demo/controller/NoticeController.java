@@ -55,5 +55,10 @@ public class NoticeController {
     public Result deleteNoticesByBatchIds(@RequestBody Collection<Long> batchIds){
         return noticeService.deleteNoticesByBatchIds(batchIds);
     }
+    @ApiOperation(value = "查询所有公告分页")
+    @PostMapping
+    public Result getAllNoticeByPage(@RequestBody Page page,@RequestParam("searchField") String searchField ){
+        return noticeService.getAllNoticeByPage(page,searchField);
+    }
 
 }

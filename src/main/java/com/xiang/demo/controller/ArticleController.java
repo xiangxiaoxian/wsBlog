@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 /**
@@ -76,8 +77,8 @@ public class ArticleController {
 
   @ApiOperation(value = "文章内部图片上传")
   @PostMapping("/imgUpload")
-  public Result imgUpload(@RequestParam(value = "pic", required = false) MultipartFile pic) {
-    return articleService.imgUpload(pic);
+  public Result imgUpload(@RequestParam(value = "pic", required = false) MultipartFile pic, HttpServletRequest request) {
+    return articleService.imgUpload(pic,request);
   }
 
   @ApiOperation(value = "查询当前文章该用户是否点赞")

@@ -18,7 +18,9 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
@@ -134,7 +136,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article>
   // 点赞数加1
   @Override
   @Transactional
-  public Result upStarOne(Long id,ArticleStar articleStar) {
+  public Result upStarOne(Long id, ArticleStar articleStar) {
     articleStarMapper.updateById(articleStar);
     articleMapper.upStarOne(id);
     return Result.success(200, "success", null);
@@ -143,7 +145,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article>
   // 点赞数减1
   @Override
   @Transactional
-  public Result lowStar(Long id,ArticleStar articleStar) {
+  public Result lowStar(Long id, ArticleStar articleStar) {
     articleStarMapper.updateById(articleStar);
     articleMapper.lowStar(id);
     return Result.success(200, "success", null);
@@ -160,11 +162,24 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article>
 
   @Override
   @Transactional
-  public Result imgUpload(MultipartFile pic) {
+  public Result imgUpload(MultipartFile pic, HttpServletRequest request) {
     String fileName = pic.getOriginalFilename().replaceAll("\\s+", "");
-    String filePath = "E:/wsBlogArticle/" + fileName; // 上传后的路径
-    String resultUrl = filePath.replaceAll("\\\\", "/");
-    File dest = new File(filePath + fileName);
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+    String dateName = sdf.format(new Date());//上传的时间文件夹
+    String filePath = "E:/wsBlogArticle/" + dateName ; // 上传后的路径
+    File baseFolder = new File( filePath);
+    if (!baseFolder.exists()) {
+      baseFolder.mkdirs();
+    }
+    File dest = new File(baseFolder,fileName);
+    StringBuffer resultUrl = new StringBuffer();
+    resultUrl.append(request.getScheme()).append("://").append(request.getServerName())
+            .append(":")
+            .append(request.getServerPort())
+            .append("/file/")
+            .append(dateName)
+            .append("/")
+            .append(fileName);
     try {
       pic.transferTo(dest);
     } catch (Exception e) {
@@ -174,24 +189,24 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article>
     return Result.success(200, "上传成功", resultUrl);
   }
 
-  //查询当前你用户是否 点赞该文章
+  // 查询当前你用户是否 点赞该文章
   @Override
   public Result starTrueOrFalse(Long id, Long userId) {
-    QueryWrapper<ArticleStar> queryWrapperByStar=new QueryWrapper<>();
-    queryWrapperByStar.eq("user_id",userId).eq("article_id",id);
+    QueryWrapper<ArticleStar> queryWrapperByStar = new QueryWrapper<>();
+    queryWrapperByStar.eq("user_id", userId).eq("article_id", id);
     ArticleStar articleStar = articleStarMapper.selectOne(queryWrapperByStar);
-    if (ObjectUtils.isEmpty(articleStar)){//未查询到符合条件数据
-      ArticleStar articleStar1=new ArticleStar();
+    if (ObjectUtils.isEmpty(articleStar)) { // 未查询到符合条件数据
+      ArticleStar articleStar1 = new ArticleStar();
       articleStar1.setArticleId(id);
       articleStar1.setUserId(userId);
       articleStarMapper.insert(articleStar1);
-      return Result.success(200,"success",articleStarMapper.selectOne(queryWrapperByStar));
+      return Result.success(200, "success", articleStarMapper.selectOne(queryWrapperByStar));
     }
-    return Result.success(200,"success",articleStar);
+    return Result.success(200, "success", articleStar);
   }
 
   @Override
   public Result getArticleTop20() {
-    return Result.success(200,"success",articleMapper.getArticleTop20());
+    return Result.success(200, "success", articleMapper.getArticleTop20());
   }
 }

@@ -9,6 +9,7 @@ import com.xiang.demo.entity.Lable;
 import com.xiang.demo.entity.Sort;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 /**
@@ -36,7 +37,7 @@ public interface ArticleService extends IService<Article> {
 
     Result getArticleByUserId(Page page,Long id);
 
-    Result imgUpload(MultipartFile pic);
+    Result imgUpload(MultipartFile pic, HttpServletRequest request);
 
     Result starTrueOrFalse(Long id, Long userId);
 

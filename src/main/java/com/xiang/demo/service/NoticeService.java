@@ -1,5 +1,6 @@
 package com.xiang.demo.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xiang.common.Result;
 import com.xiang.demo.entity.Notice;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -21,4 +22,6 @@ public interface NoticeService extends IService<Notice> {
     Result deleteNoticeById(Long id);
 
     Result deleteNoticesByBatchIds(Collection<Long> batchIds);
+
+    Result getAllNoticeByPage(Page page, String searchField);
 }

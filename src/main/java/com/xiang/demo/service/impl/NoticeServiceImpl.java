@@ -1,5 +1,7 @@
 package com.xiang.demo.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xiang.common.Result;
 import com.xiang.demo.entity.Notice;
 import com.xiang.demo.mapper.NoticeMapper;
@@ -51,5 +53,14 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
   public Result deleteNoticesByBatchIds(Collection<Long> batchIds) {
     noticeMapper.deleteBatchIds(batchIds);
     return Result.success(200, "批量删除成功", null);
+  }
+
+  //查询所有公告分页
+  @Override
+  public Result getAllNoticeByPage(Page page, String searchField) {
+    QueryWrapper<Notice> noticeQueryWrapper=new QueryWrapper<>();
+    noticeQueryWrapper.like("content",searchField).eq("deleted",0);
+    Page<Notice> noticePage=noticeMapper.selectPage(page,noticeQueryWrapper);
+    return Result.success(200,"success",noticePage);
   }
 }
