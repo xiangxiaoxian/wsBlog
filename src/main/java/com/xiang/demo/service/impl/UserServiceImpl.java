@@ -74,7 +74,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
   @Transactional
   public Result registerOrUpdateUserById(User user) {
     // 对密码进行md5加密
-    user.setPassword(SecureUtil.md5(user.getPassword()));
     if (ObjectUtils.isEmpty(user.getId())) { // 根据实体有无id进行资料修改或注册判断
       UserRole userRole = new UserRole();
       QueryWrapper<User> wrapper = new QueryWrapper<User>();
@@ -87,6 +86,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
       if (!ObjectUtils.isEmpty(userMapper.selectOne(wrapperByNickName))) {
         return Result.error(400, "昵称已被占用");
       }
+      user.setPassword(SecureUtil.md5(user.getPassword()));
       user.setAvatar("001.jpg");
       userMapper.insert(user);
       userRole.setUserId(userMapper.selectOne(wrapper).getId()); // 对注册的用户进行角色分配
@@ -289,5 +289,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     QueryWrapper<User> queryWrapper = new QueryWrapper<>();
     queryWrapper.like("nick_name", searchField).ne("r.role_name", "用户").eq("ur.deleted", 0).eq("r.deleted",0);
     return Result.success(200, "查询成功", userMapper.selectAllUserBySearchField(page, queryWrapper));
+  }
+
+  //查询所有账号信息并分页
+  @Override
+  public Result getAllUsersAndPages(Page page, String searchField) {
+    QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+    queryWrapper.like("nick_name", searchField).eq("deleted",0);
+    Page userPage = userMapper.selectPage(page, queryWrapper);
+    return Result.success(200, "查询成功",userPage);
   }
 }

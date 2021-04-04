@@ -90,4 +90,10 @@ public class UserController {
     return userService.updateNickName(user);
   }
 
+  @ApiOperation(value = "查询所有账号资料并分页")
+  @PostMapping("/user")
+  public Result getAllUsersAndPages(@RequestBody Page page,@RequestParam String searchField) {
+    return userService.getAllUsersAndPages(page,searchField);
+  }
+
 }

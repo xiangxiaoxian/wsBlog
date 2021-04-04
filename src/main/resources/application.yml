@@ -6,13 +6,13 @@ server:
 
 spring:
   datasource:
-    driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/wsblog?useUnicode=true&characterEncoding=utf8
-    username: root
-    password: 123456
+    driver-class-name: com.mysql.jdbc.Driver #连接池
+    url: jdbc:mysql://localhost:3306/wsblog?useUnicode=true&characterEncoding=utf8 #连接地址
+    username: root #用户名
+    password: 123456 #密码
   jackson:
-    date-format: yyyy-MM-dd
-    time-zone: GMT+8
+    date-format: yyyy-MM-dd #时间格式转换
+    time-zone: GMT+8 #时区规定
   profiles:
     active: dev
   mail:

@@ -46,4 +46,6 @@ public interface UserService extends IService<User> {
     Result updateNickName(User user);
 
     Result getAllManAndPages(Page page, String searchField);
+
+    Result getAllUsersAndPages(Page page, String searchField);
 }

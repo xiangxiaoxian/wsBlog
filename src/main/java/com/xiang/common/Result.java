@@ -30,9 +30,6 @@ public class Result implements Serializable {
         this.msg = msg;
         this.data = data;
     }
-
-
-
     public Result() {
     }
 }
