@@ -15,7 +15,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author XR
@@ -38,7 +38,7 @@ public class Comments implements Serializable {
     /**
      * 评论日期
      */
-    @JsonFormat(pattern ="yyyy-MM-dd hh-mm-ss")
+    @JsonFormat(pattern ="yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private LocalDateTime commentsDate;
 
     /**

@@ -280,6 +280,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     User userForNickName = new User();
     userForNickName.setId(user.getId());
     userForNickName.setNickName(user.getNickName());
+
+
     userMapper.updateById(userForNickName);
     return Result.success(200, "修改成功", null);
   }
