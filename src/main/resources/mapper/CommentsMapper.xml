@@ -1,7 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.xiang.demo.mapper.CommentsMapper">
-    <resultMap id="comments" type="com.xiang.demo.entity.Comments">
+<!--    <resultMap id="comments" type="com.xiang.demo.entity.Comments">-->
+<!--        <id property="id" column="id"/>-->
+<!--        <result property="commentsDate" column="commentsDate"/>-->
+<!--        <result property="star" column="star"/>-->
+<!--        <result property="content" column="content"/>-->
+<!--        <result property="parentCommentsId" column="parentCommentsId"/>-->
+<!--        <result property="parentCommentsNickName" column="parentCommentsNickName"/>-->
+<!--        <result property="userId" column="userId"/>-->
+<!--        <association property="user" javaType="com.xiang.demo.entity.User">-->
+<!--            <result property="nickName" column="nickName"/>-->
+<!--            <result property="avatar" column="avatar"/>-->
+<!--        </association>-->
+<!--    </resultMap>-->
+
+    <resultMap id="commentss" type="com.xiang.demo.entity.Comments">
         <id property="id" column="id"/>
         <result property="commentsDate" column="commentsDate"/>
         <result property="star" column="star"/>
@@ -13,10 +27,11 @@
             <result property="nickName" column="nickName"/>
             <result property="avatar" column="avatar"/>
         </association>
+        <collection property="commentsReply" ofType="com.xiang.demo.entity.Comments" select="selectCommentsByReply" column="id">
+        </collection>
     </resultMap>
-
     <!--根据文章id查询该文章下评论-->
-    <select id="selectCommentsByArticleId" resultMap="comments">
+    <!--<select id="selectCommentsByArticleId" resultMap="comments">
         SELECT
         c.id,c.star,c.comments_date as commentsDate,c.content,c.parent_comments_id as parentCommentsId,c.user_id as userId,c.parent_comments_nick_name as parentCommentsNickName,
         u.avatar as avatar, u.nick_name as nickName
@@ -24,5 +39,26 @@
         LEFT JOIN `user` u on c.user_id=u.id
         WHERE c.deleted=0 AND c.article_id=#{articleId}
         ORDER BY c.comments_date ASC
-    </select>
+    </select>-->
+
+    <select id="selectCommentsByArticleId" resultMap="commentss">
+            SELECT
+                c.id,c.comments_date as commentsDate,c.content,c.user_id as userId,
+                u.avatar as avatar, u.nick_name as nickName
+                FROM comments c
+                LEFT JOIN `user` u on c.user_id=u.id
+                WHERE  c.article_id=#{articleId} and c.deleted=0  and c.parent_comments_id is NULL
+                GROUP BY c.id
+                ORDER BY c.comments_date ASC
+     </select>
+
+    <select id="selectCommentsByReply" resultMap="commentss">
+            SELECT
+                c.id,c.star,c.comments_date as commentsDate,c.content,c.parent_comments_id as parentCommentsId,c.user_id as userId,c.parent_comments_nick_name as parentCommentsNickName,
+                u.avatar as avatar, u.nick_name as nickName
+                FROM comments c
+                LEFT JOIN `user` u on c.user_id=u.id
+                WHERE  c.parent_comments_id=#{parentCommentsId} and c.deleted=0
+                ORDER BY c.comments_date ASC
+     </select>
 </mapper>

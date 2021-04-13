@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.time.LocalDateTime;
 import java.io.Serializable;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
@@ -82,4 +83,9 @@ public class Comments implements Serializable {
     @TableField(exist = false)
     private User user;
 
+    /*
+    * 回复评论
+    * */
+    @TableField(exist = false)
+    private List<Comments> commentsReply;
 }
