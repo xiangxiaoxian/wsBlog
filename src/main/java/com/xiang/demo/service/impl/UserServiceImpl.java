@@ -144,7 +144,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
   @Override
   public Result getAllUserAndPages(Page page, String searchField) {
     QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-    queryWrapper.like("nick_name", searchField).eq("r.role_name", "用户").eq("ur.deleted", 0).eq("r.deleted",0);
+    queryWrapper.like("nick_name", searchField).eq("r.role_name", "用户").eq("ur.deleted", 0).eq("r.deleted",0).eq("u.deleted",0);
     return Result.success(200, "查询成功", userMapper.selectAllUserBySearchField(page, queryWrapper));
   }
 
@@ -220,6 +220,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
   }
 
+  //修改密码
   @Override
   @Transactional
   public Result updatePassword(Map<String, Object> data) {
@@ -273,23 +274,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
   @Transactional
   public Result updateNickName(User user) {
     QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
-    userQueryWrapper.eq("nick_name", user.getNickName());
+    userQueryWrapper.eq("nick_name", user.getNickName()).ne("id",user.getId());
     if (!ObjectUtils.isEmpty(userMapper.selectOne(userQueryWrapper))) {
       return Result.error(400, "该昵称已被使用");
     }
     User userForNickName = new User();
     userForNickName.setId(user.getId());
     userForNickName.setNickName(user.getNickName());
-
-
     userMapper.updateById(userForNickName);
     return Result.success(200, "修改成功", null);
   }
 
+  //查询管理员分页
   @Override
   public Result getAllManAndPages(Page page, String searchField) {
     QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-    queryWrapper.like("nick_name", searchField).ne("r.role_name", "用户").eq("ur.deleted", 0).eq("r.deleted",0);
+    queryWrapper.like("nick_name", searchField).ne("r.role_name", "用户").eq("ur.deleted", 0).eq("r.deleted",0).eq("u.deleted",0);
     return Result.success(200, "查询成功", userMapper.selectAllUserBySearchField(page, queryWrapper));
   }
 

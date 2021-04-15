@@ -160,6 +160,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article>
     return Result.success(200, "查询成功", articlePage);
   }
 
+  //文章内图片上传
   @Override
   @Transactional
   public Result imgUpload(MultipartFile pic, HttpServletRequest request) {
@@ -205,6 +206,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article>
     return Result.success(200, "success", articleStar);
   }
 
+  //按浏览量查询排名前20的文章
   @Override
   public Result getArticleTop20() {
     return Result.success(200, "success", articleMapper.getArticleTop20());
