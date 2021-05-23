@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xiang.common.Result;
 import com.xiang.demo.entity.*;
 import com.xiang.demo.mapper.ArticleMapper;
+import com.xiang.demo.mapper.CommentsMapper;
 import com.xiang.demo.mapper.UserMapper;
 import com.xiang.demo.mapper.UserRoleMapper;
 import com.xiang.demo.service.UserService;
@@ -46,6 +47,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
   @Resource private ArticleMapper articleMapper;
 
   @Resource private JavaMailSender mailSender;
+
+  @Resource private CommentsMapper commentsMapper;
 
   // 登录方法实现
   @Override
@@ -114,18 +117,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
   @Override
   @Transactional
   public Result deleteUserById(Long id) {
-    // 判断该角色下是否拥有文章
-    QueryWrapper<Article> articleQueryWrapper = new QueryWrapper<>();
-    articleQueryWrapper.eq("user_id", id).eq("deleted", 0);
-    List<Article> articleList = articleMapper.selectList(articleQueryWrapper);
-    if (!ObjectUtils.isEmpty(articleList)) {
-      return Result.error(400, "该账户下存在博文,无法删除");
-    }
     // 删除之前先删除有关该账号的所有相关的资料信息
     // 删除相关角色信息
     QueryWrapper<UserRole> wrapperByUserRole = new QueryWrapper<>();
     wrapperByUserRole.eq("user_id", id);
     userRoleMapper.delete(wrapperByUserRole);
+    QueryWrapper<Comments> commentsQueryWrapper = new QueryWrapper<>();
+    // 删除评论
+    commentsQueryWrapper.eq("user_id", id).eq("deleted", 0);
+    commentsMapper.delete(commentsQueryWrapper);
+    // 删除文章
+    QueryWrapper<Article> articleQueryWrapper = new QueryWrapper<>();
+    articleQueryWrapper.eq("user_id", id).eq("deleted", 0);
+    articleMapper.delete(articleQueryWrapper);
     return Result.success(200, "删除成功", userMapper.deleteById(id));
   }
 
@@ -144,7 +148,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
   @Override
   public Result getAllUserAndPages(Page page, String searchField) {
     QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-    queryWrapper.like("nick_name", searchField).eq("r.role_name", "用户").eq("ur.deleted", 0).eq("r.deleted",0).eq("u.deleted",0);
+    queryWrapper
+        .like("nick_name", searchField)
+        .eq("r.role_name", "用户")
+        .eq("ur.deleted", 0)
+        .eq("r.deleted", 0)
+        .eq("u.deleted", 0);
     return Result.success(200, "查询成功", userMapper.selectAllUserBySearchField(page, queryWrapper));
   }
 
@@ -220,7 +229,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
   }
 
-  //修改密码
+  // 修改密码
   @Override
   @Transactional
   public Result updatePassword(Map<String, Object> data) {
@@ -274,7 +283,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
   @Transactional
   public Result updateNickName(User user) {
     QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
-    userQueryWrapper.eq("nick_name", user.getNickName()).ne("id",user.getId());
+    userQueryWrapper.eq("nick_name", user.getNickName()).ne("id", user.getId());
     if (!ObjectUtils.isEmpty(userMapper.selectOne(userQueryWrapper))) {
       return Result.error(400, "该昵称已被使用");
     }
@@ -285,20 +294,25 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     return Result.success(200, "修改成功", null);
   }
 
-  //查询管理员分页
+  // 查询管理员分页
   @Override
   public Result getAllManAndPages(Page page, String searchField) {
     QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-    queryWrapper.like("nick_name", searchField).ne("r.role_name", "用户").eq("ur.deleted", 0).eq("r.deleted",0).eq("u.deleted",0);
+    queryWrapper
+        .like("nick_name", searchField)
+        .ne("r.role_name", "用户")
+        .eq("ur.deleted", 0)
+        .eq("r.deleted", 0)
+        .eq("u.deleted", 0);
     return Result.success(200, "查询成功", userMapper.selectAllUserBySearchField(page, queryWrapper));
   }
 
-  //查询所有账号信息并分页
+  // 查询所有账号信息并分页
   @Override
   public Result getAllUsersAndPages(Page page, String searchField) {
     QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-    queryWrapper.like("nick_name", searchField).eq("deleted",0);
+    queryWrapper.like("nick_name", searchField).eq("deleted", 0);
     Page userPage = userMapper.selectPage(page, queryWrapper);
-    return Result.success(200, "查询成功",userPage);
+    return Result.success(200, "查询成功", userPage);
   }
 }

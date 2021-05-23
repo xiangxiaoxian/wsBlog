@@ -75,18 +75,19 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article>
       article.setPubTime(new Date());
       articleMapper.insert(article);
       // 查询刚插入的数据
-      QueryWrapper<Article> articleQueryWrapper = new QueryWrapper<>();
-      articleQueryWrapper
-          .eq("user_id", article.getUserId())
-          .eq("title", article.getTitle())
-          .eq("content", article.getContent());
-      Article article1 = articleMapper.selectOne(articleQueryWrapper);
+//      QueryWrapper<Article> articleQueryWrapper = new QueryWrapper<>();
+//      articleQueryWrapper
+//          .eq("user_id", article.getUserId())
+//          .eq("title", article.getTitle())
+//          .eq("content", article.getContent());
+//      Article article1 = articleMapper.selectOne(articleQueryWrapper);
+      Long id=article.getId();
       // 插入分类表
-      articleSort.setArticleId(article1.getId());
+      articleSort.setArticleId(id);
       articleSort.setSortId(sortId);
       articleSortMapper.insert(articleSort);
       // 插入标签表
-      articleLable.setArticleId(article1.getId());
+      articleLable.setArticleId(id);
       articleLable.setLableId(lableId);
       articleLableMapper.insert(articleLable);
       return Result.success(200, "发布成功", article);
